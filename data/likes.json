@@ -1,0 +1,28 @@
+{
+  "likes": [
+    {
+      "id": "de37c112-9f5a-4079-bb06-f8def3aad715",
+      "tripId": "5580c183-0530-4ff4-a375-957447949f8d",
+      "userId": "8f8eb0f8-d8b1-4f10-8022-44d56bd96ab6",
+      "createdAt": "2026-02-12T11:46:06.950Z"
+    },
+    {
+      "id": "7d83c6a2-585a-42d2-9caf-e9d798c98f0a",
+      "tripId": "b4ab4e20-a765-4dca-9238-ab62d29df94e",
+      "userId": "8f8eb0f8-d8b1-4f10-8022-44d56bd96ab6",
+      "createdAt": "2026-02-12T11:46:08.924Z"
+    },
+    {
+      "id": "8f88f9b2-90ec-4368-80e3-49523809c08a",
+      "tripId": "b4ab4e20-a765-4dca-9238-ab62d29df94e",
+      "userId": "58ce7eed-4227-431a-8df9-0cb98caba936",
+      "createdAt": "2026-02-12T12:20:06.111Z"
+    },
+    {
+      "id": "7652466f-33fe-4ff0-9ae5-65f2d7310524",
+      "tripId": "5580c183-0530-4ff4-a375-957447949f8d",
+      "userId": "58ce7eed-4227-431a-8df9-0cb98caba936",
+      "createdAt": "2026-02-12T12:20:08.476Z"
+    }
+  ]
+}

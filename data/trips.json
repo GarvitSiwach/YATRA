@@ -1,0 +1,74 @@
+{
+  "trips": [
+    {
+      "id": "5580c183-0530-4ff4-a375-957447949f8d",
+      "userId": "58ce7eed-4227-431a-8df9-0cb98caba936",
+      "destination": "Kashmir",
+      "startDate": "2026-02-13",
+      "endDate": "2026-02-15",
+      "budget": "20000",
+      "travelType": "Friends",
+      "notes": "…",
+      "itineraryDays": [
+        {
+          "id": "01f37c3f-4705-49a0-89f7-cb9f222bd6cb",
+          "title": "Day 1",
+          "activities": [
+            {
+              "id": "b90104aa-fb6c-46ae-8158-9707a4ce9a34",
+              "name": "Gondola, Gulmarg"
+            }
+          ]
+        },
+        {
+          "id": "31dce542-1e48-47db-b451-992bde70147e",
+          "title": "Day 2",
+          "activities": [
+            {
+              "id": "37b7e401-f6f8-48fa-910c-d1f27d0157cb",
+              "name": "Shikara, Dal Lake"
+            }
+          ]
+        },
+        {
+          "id": "10daf4a8-870f-4d32-8490-ed1de3d219e2",
+          "title": "Day 3",
+          "activities": [
+            {
+              "id": "e0f1f17a-ccbc-4c0b-a987-f85eea69953d",
+              "name": "Sledge, Sonmarg"
+            }
+          ]
+        }
+      ],
+      "createdAt": "2026-02-12T11:13:41.469Z",
+      "updatedAt": "2026-02-12T11:14:30.619Z",
+      "lastViewedAt": "2026-02-12T11:13:41.971Z"
+    },
+    {
+      "id": "b4ab4e20-a765-4dca-9238-ab62d29df94e",
+      "userId": "58ce7eed-4227-431a-8df9-0cb98caba936",
+      "destination": "Dehradun",
+      "startDate": "2026-02-02",
+      "endDate": "2026-02-03",
+      "budget": "100",
+      "travelType": "Solo",
+      "notes": "…",
+      "itineraryDays": [
+        {
+          "id": "6b1d8924-0287-4826-8839-da4d93f63daf",
+          "title": "Day 1",
+          "activities": []
+        },
+        {
+          "id": "930a9188-b7b2-4346-b588-666857391232",
+          "title": "Day 2",
+          "activities": []
+        }
+      ],
+      "createdAt": "2026-02-12T11:23:09.168Z",
+      "updatedAt": "2026-02-12T11:23:09.168Z",
+      "lastViewedAt": "2026-02-12T11:45:32.621Z"
+    }
+  ]
+}

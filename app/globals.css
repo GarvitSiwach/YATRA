@@ -1,0 +1,28 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+* {
+  border-color: rgba(14, 14, 14, 0.16);
+}
+
+body {
+  font-family: 'Avenir Next', 'Segoe UI', 'Helvetica Neue', sans-serif;
+  background: radial-gradient(circle at top, rgba(201, 162, 77, 0.12), transparent 38%), #ffffff;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: 'Iowan Old Style', 'Palatino Linotype', 'Book Antiqua', serif;
+  letter-spacing: 0.01em;
+}
+
+::selection {
+  background: rgba(201, 162, 77, 0.25);
+}

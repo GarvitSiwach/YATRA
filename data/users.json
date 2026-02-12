@@ -1,0 +1,48 @@
+{
+  "users": [
+    {
+      "id": "58ce7eed-4227-431a-8df9-0cb98caba936",
+      "name": "Garvit Siwach",
+      "email": "siwach.garvit10@gmail.com",
+      "passwordHash": "$2a$12$syeqkahZlGnU0cPHiovyMOKSLGEgCjObGfGQt81MfBYvGuFE1s8FW",
+      "createdAt": "2026-02-12T10:43:18.622Z",
+      "profileImage": "https://ui-avatars.com/api/?name=Garvit+Siwach&size=300&background=CBA258&color=ffffff"
+    },
+    {
+      "id": "295505e9-d214-475a-aa02-f67c44584c7c",
+      "name": "Test User",
+      "email": "test@example.com",
+      "passwordHash": "$2a$12$dDamOphfgK5K9A7T4r0n6ud2Mb/7Lafki212Zn6cxQDyeC0nq6QPq",
+      "createdAt": "2026-02-12T10:49:33.809Z"
+    },
+    {
+      "id": "39c8bf02-a32b-4b20-b712-09a063b437a8",
+      "name": "Test User",
+      "email": "test2@example.com",
+      "passwordHash": "$2a$12$WcJ7R8eDsRVd/zb6w.kLfObEt05CzBYWUv2bQOaEwu9tFrbZrkoxG",
+      "createdAt": "2026-02-12T10:49:40.244Z"
+    },
+    {
+      "id": "b6797ddf-8665-418e-ab17-ecd63fc0f3af",
+      "name": "Test User",
+      "email": "test3@example.com",
+      "passwordHash": "$2a$12$npJVUe.iCBR/uualCZ.bsOQ2/9OsqBfEAWgsSzSsggL7vCVA4x1ha",
+      "createdAt": "2026-02-12T10:50:22.116Z"
+    },
+    {
+      "id": "69be1c82-9d61-472b-bc15-596c5a3b7fbd",
+      "name": "Test User",
+      "email": "test4@example.com",
+      "passwordHash": "$2a$12$A01ZurMHq9U7ygMcE/6gaOdGPYx7mTpsaxqpP4p1nSYq89w0D3OBO",
+      "createdAt": "2026-02-12T10:51:16.370Z"
+    },
+    {
+      "id": "8f8eb0f8-d8b1-4f10-8022-44d56bd96ab6",
+      "name": "Anshaj Siwach",
+      "email": "siwach.anshaj10@gmail.com",
+      "passwordHash": "$2a$12$zIj3Fbi1YwpPyxmTsKCQmezoPOoNSabkqEbutB4weLQH6rUIozCcu",
+      "createdAt": "2026-02-12T10:53:23.694Z",
+      "profileImage": "https://randomuser.me/api/portraits/men/32.jpg"
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "notifications": [
+    {
+      "id": "e4e01ce1-89d2-461e-97bc-0613d95126e4",
+      "userId": "58ce7eed-4227-431a-8df9-0cb98caba936",
+      "type": "like",
+      "actorId": "8f8eb0f8-d8b1-4f10-8022-44d56bd96ab6",
+      "tripId": "5580c183-0530-4ff4-a375-957447949f8d",
+      "createdAt": "2026-02-12T11:46:06.951Z",
+      "read": true
+    },
+    {
+      "id": "c7f23af4-6192-4d84-94eb-252aae6eb73d",
+      "userId": "58ce7eed-4227-431a-8df9-0cb98caba936",
+      "type": "like",
+      "actorId": "8f8eb0f8-d8b1-4f10-8022-44d56bd96ab6",
+      "tripId": "b4ab4e20-a765-4dca-9238-ab62d29df94e",
+      "createdAt": "2026-02-12T11:46:08.925Z",
+      "read": true
+    },
+    {
+      "id": "44caaf0c-50d8-4c20-a1b7-5e0dbae13f9b",
+      "userId": "58ce7eed-4227-431a-8df9-0cb98caba936",
+      "type": "follow",
+      "actorId": "8f8eb0f8-d8b1-4f10-8022-44d56bd96ab6",
+      "createdAt": "2026-02-12T11:46:11.491Z",
+      "read": true
+    },
+    {
+      "id": "c7b75c86-f94a-4d76-8dcf-63a681afacf4",
+      "userId": "58ce7eed-4227-431a-8df9-0cb98caba936",
+      "type": "comment",
+      "actorId": "8f8eb0f8-d8b1-4f10-8022-44d56bd96ab6",
+      "tripId": "5580c183-0530-4ff4-a375-957447949f8d",
+      "createdAt": "2026-02-12T11:46:27.654Z",
+      "read": true
+    },
+    {
+      "id": "82f94c0c-1a3a-4f3c-b5ab-bf430d92423d",
+      "userId": "8f8eb0f8-d8b1-4f10-8022-44d56bd96ab6",
+      "type": "follow",
+      "actorId": "58ce7eed-4227-431a-8df9-0cb98caba936",
+      "createdAt": "2026-02-12T11:46:39.417Z",
+      "read": true
+    }
+  ]
+}

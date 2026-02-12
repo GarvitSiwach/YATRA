@@ -1,0 +1,16 @@
+{
+  "follows": [
+    {
+      "id": "8b62973c-6fd4-4179-91ab-c8d03bae9b44",
+      "followerId": "8f8eb0f8-d8b1-4f10-8022-44d56bd96ab6",
+      "followingId": "58ce7eed-4227-431a-8df9-0cb98caba936",
+      "createdAt": "2026-02-12T11:46:11.491Z"
+    },
+    {
+      "id": "c053b859-8bd5-4822-b0d1-4f8144c21543",
+      "followerId": "58ce7eed-4227-431a-8df9-0cb98caba936",
+      "followingId": "8f8eb0f8-d8b1-4f10-8022-44d56bd96ab6",
+      "createdAt": "2026-02-12T11:46:39.416Z"
+    }
+  ]
+}
