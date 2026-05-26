@@ -1,13 +1,14 @@
-import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
+
+import { SESSION_COOKIE_NAME } from '@/lib/session';
 
 export const runtime = 'nodejs';
 
 export async function POST(): Promise<NextResponse> {
   try {
-    const cookieStore = cookies();
+    const response = NextResponse.json({ ok: true }, { status: 200 });
 
-    cookieStore.set('yatra_session', '', {
+    response.cookies.set(SESSION_COOKIE_NAME, '', {
       httpOnly: true,
       sameSite: 'lax',
       secure: process.env.NODE_ENV === 'production',
@@ -15,7 +16,7 @@ export async function POST(): Promise<NextResponse> {
       maxAge: 0
     });
 
-    return NextResponse.json({ ok: true }, { status: 200 });
+    return response;
   } catch {
     return NextResponse.json({ error: 'Unable to log out right now.' }, { status: 500 });
   }

@@ -13,18 +13,36 @@ import {
   Notification,
   NotificationsFile,
   SafeUser,
+  SocialTrip,
   Trip,
   TripsFile,
   UserRecord,
   UsersFile
 } from '@/lib/types';
 
-const dataDir = path.join(process.cwd(), 'data');
+export type StoredUser = UserRecord & {
+  passwordHash?: string;
+};
 
-function normalizeTrip(trip: Trip): Trip {
+export type DatabaseFile = UsersFile &
+  TripsFile &
+  LikesFile &
+  FollowsFile &
+  CommentsFile &
+  NotificationsFile &
+  ContactsFile;
+
+const DATABASE_PATH = path.join(process.cwd(), 'data', 'database.json');
+
+function emptyStore(): DatabaseFile {
   return {
-    ...trip,
-    isPublic: trip.isPublic ?? true
+    users: [],
+    trips: [],
+    likes: [],
+    follows: [],
+    comments: [],
+    notifications: [],
+    messages: []
   };
 }
 
@@ -39,102 +57,252 @@ function normalizeOptionalText(value: unknown): string | undefined {
 
 function normalizeUserRecord(user: UserRecord): UserRecord {
   return {
-    ...user,
+    id: user.id,
+    name: user.name,
+    email: user.email.trim().toLowerCase(),
     profileImage: normalizeOptionalText(user.profileImage),
-    bio: normalizeOptionalText(user.bio)
+    bio: normalizeOptionalText(user.bio),
+    createdAt: user.createdAt
   };
 }
 
-async function ensureDataFile<T>(fileName: string, fallback: T): Promise<string> {
-  await fs.mkdir(dataDir, { recursive: true });
-  const filePath = path.join(dataDir, fileName);
-
-  try {
-    await fs.access(filePath);
-  } catch {
-    await fs.writeFile(filePath, JSON.stringify(fallback, null, 2), 'utf8');
-  }
-
-  return filePath;
+function normalizeTrip(trip: Trip): Trip {
+  return {
+    ...trip,
+    isPublic: trip.isPublic ?? true
+  };
 }
 
-async function readJsonFile<T>(fileName: string, fallback: T): Promise<T> {
-  const filePath = await ensureDataFile(fileName, fallback);
+function normalizeStoredUser(user: StoredUser): StoredUser {
+  return {
+    ...normalizeUserRecord(user),
+    passwordHash: normalizeOptionalText(user.passwordHash)
+  };
+}
 
+function sortByCreatedDesc<T extends { createdAt: string }>(items: T[]): T[] {
+  return [...items].sort((first, second) => second.createdAt.localeCompare(first.createdAt));
+}
+
+async function readStore(): Promise<DatabaseFile> {
   try {
-    const raw = await fs.readFile(filePath, 'utf8');
-    return JSON.parse(raw) as T;
-  } catch {
-    await fs.writeFile(filePath, JSON.stringify(fallback, null, 2), 'utf8');
-    return fallback;
+    const raw = await fs.readFile(DATABASE_PATH, 'utf8');
+    const parsed = JSON.parse(raw) as Partial<DatabaseFile>;
+
+    return {
+      users: Array.isArray(parsed.users)
+        ? (parsed.users as StoredUser[]).map(normalizeStoredUser)
+        : [],
+      trips: Array.isArray(parsed.trips) ? (parsed.trips as Trip[]).map(normalizeTrip) : [],
+      likes: Array.isArray(parsed.likes) ? (parsed.likes as Like[]) : [],
+      follows: Array.isArray(parsed.follows) ? (parsed.follows as Follow[]) : [],
+      comments: Array.isArray(parsed.comments) ? (parsed.comments as Comment[]) : [],
+      notifications: Array.isArray(parsed.notifications)
+        ? (parsed.notifications as Notification[])
+        : [],
+      messages: Array.isArray(parsed.messages) ? (parsed.messages as ContactMessage[]) : []
+    };
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
+      const store = emptyStore();
+      await writeStore(store);
+      return store;
+    }
+
+    throw error;
   }
 }
 
-async function writeJsonFile<T>(fileName: string, value: T): Promise<void> {
-  const filePath = await ensureDataFile(fileName, value);
-  await fs.writeFile(filePath, JSON.stringify(value, null, 2), 'utf8');
+async function writeStore(store: DatabaseFile): Promise<void> {
+  await fs.mkdir(path.dirname(DATABASE_PATH), { recursive: true });
+  await fs.writeFile(`${DATABASE_PATH}.tmp`, `${JSON.stringify(store, null, 2)}\n`, 'utf8');
+  await fs.rename(`${DATABASE_PATH}.tmp`, DATABASE_PATH);
+}
+
+async function updateStore<T>(updater: (store: DatabaseFile) => T): Promise<T> {
+  const store = await readStore();
+  const result = updater(store);
+  await writeStore(store);
+  return result;
+}
+
+export async function readDatabaseFile(): Promise<DatabaseFile> {
+  return readStore();
+}
+
+export async function writeDatabaseFile(value: DatabaseFile): Promise<void> {
+  await writeStore({
+    users: value.users.map((user) => normalizeStoredUser(user as StoredUser)),
+    trips: value.trips.map(normalizeTrip),
+    likes: value.likes,
+    follows: value.follows,
+    comments: value.comments,
+    notifications: value.notifications,
+    messages: value.messages
+  });
+}
+
+function normalizeItineraryDays(value: unknown): Trip['itineraryDays'] {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return value
+    .map((day, dayIndex) => {
+      if (!day || typeof day !== 'object') {
+        return null;
+      }
+
+      const dayRecord = day as Record<string, unknown>;
+      const id =
+        typeof dayRecord.id === 'string' && dayRecord.id.trim()
+          ? dayRecord.id
+          : crypto.randomUUID();
+      const title =
+        typeof dayRecord.title === 'string' && dayRecord.title.trim()
+          ? dayRecord.title.trim()
+          : `Day ${dayIndex + 1}`;
+
+      const rawActivities = Array.isArray(dayRecord.activities) ? dayRecord.activities : [];
+      const activities = rawActivities
+        .map((activity) => {
+          if (!activity || typeof activity !== 'object') {
+            return null;
+          }
+
+          const activityRecord = activity as Record<string, unknown>;
+          const name = typeof activityRecord.name === 'string' ? activityRecord.name.trim() : '';
+          if (!name) {
+            return null;
+          }
+
+          const activityId =
+            typeof activityRecord.id === 'string' && activityRecord.id.trim()
+              ? activityRecord.id
+              : crypto.randomUUID();
+
+          return {
+            id: activityId,
+            name
+          };
+        })
+        .filter((activity): activity is { id: string; name: string } => Boolean(activity));
+
+      return {
+        id,
+        title,
+        activities
+      };
+    })
+    .filter((day): day is Trip['itineraryDays'][number] => Boolean(day));
 }
 
 export async function readTripsFile(): Promise<TripsFile> {
-  return readJsonFile<TripsFile>('trips.json', { trips: [] });
+  const store = await readStore();
+  return {
+    trips: store.trips.map(normalizeTrip)
+  };
 }
 
 export async function writeTripsFile(value: TripsFile): Promise<void> {
-  await writeJsonFile<TripsFile>('trips.json', value);
+  await updateStore((store) => {
+    store.trips = value.trips.map(normalizeTrip);
+  });
 }
 
 export async function readLikesFile(): Promise<LikesFile> {
-  return readJsonFile<LikesFile>('likes.json', { likes: [] });
+  const store = await readStore();
+  return {
+    likes: store.likes
+  };
 }
 
 export async function writeLikesFile(value: LikesFile): Promise<void> {
-  await writeJsonFile<LikesFile>('likes.json', value);
+  await updateStore((store) => {
+    store.likes = value.likes;
+  });
 }
 
 export async function readFollowsFile(): Promise<FollowsFile> {
-  return readJsonFile<FollowsFile>('follows.json', { follows: [] });
+  const store = await readStore();
+  return {
+    follows: store.follows
+  };
 }
 
 export async function writeFollowsFile(value: FollowsFile): Promise<void> {
-  await writeJsonFile<FollowsFile>('follows.json', value);
+  await updateStore((store) => {
+    store.follows = value.follows;
+  });
 }
 
 export async function readCommentsFile(): Promise<CommentsFile> {
-  return readJsonFile<CommentsFile>('comments.json', { comments: [] });
+  const store = await readStore();
+  return {
+    comments: store.comments
+  };
 }
 
 export async function writeCommentsFile(value: CommentsFile): Promise<void> {
-  await writeJsonFile<CommentsFile>('comments.json', value);
+  await updateStore((store) => {
+    store.comments = value.comments;
+  });
 }
 
 export async function readNotificationsFile(): Promise<NotificationsFile> {
-  return readJsonFile<NotificationsFile>('notifications.json', { notifications: [] });
+  const store = await readStore();
+  return {
+    notifications: store.notifications
+  };
 }
 
 export async function writeNotificationsFile(value: NotificationsFile): Promise<void> {
-  await writeJsonFile<NotificationsFile>('notifications.json', value);
+  await updateStore((store) => {
+    store.notifications = value.notifications;
+  });
 }
 
 export async function getUsers(): Promise<UserRecord[]> {
-  const payload = await readJsonFile<UsersFile>('users.json', { users: [] });
-  return payload.users.map(normalizeUserRecord);
+  const store = await readStore();
+  return store.users
+    .map((user) => sanitizeUser(user as StoredUser))
+    .sort((first, second) => first.name.localeCompare(second.name));
 }
 
 export async function findUserByEmail(email: string): Promise<UserRecord | undefined> {
-  const normalizedEmail = email.trim().toLowerCase();
-  const users = await getUsers();
-  return users.find((user) => user.email === normalizedEmail);
+  const user = await findStoredUserByEmail(email);
+  return user ? sanitizeUser(user) : undefined;
 }
 
-export async function createUser(user: UserRecord): Promise<void> {
-  const payload = await readJsonFile<UsersFile>('users.json', { users: [] });
-  payload.users.push(normalizeUserRecord(user));
-  await writeJsonFile<UsersFile>('users.json', payload);
+export async function findStoredUserByEmail(email: string): Promise<StoredUser | undefined> {
+  const normalizedEmail = email.trim().toLowerCase();
+  const store = await readStore();
+  return store.users.find((user) => user.email.trim().toLowerCase() === normalizedEmail) as
+    | StoredUser
+    | undefined;
+}
+
+export async function createUser(user: StoredUser): Promise<void> {
+  await updateStore((store) => {
+    const normalized = normalizeStoredUser(user);
+    const existingIndex = store.users.findIndex((item) => item.id === normalized.id);
+
+    if (existingIndex >= 0) {
+      store.users[existingIndex] = {
+        ...(store.users[existingIndex] as StoredUser),
+        ...normalized
+      };
+      return;
+    }
+
+    store.users.push(normalized);
+  });
 }
 
 export async function getUserById(id: string): Promise<UserRecord | undefined> {
-  const users = await getUsers();
-  return users.find((user) => user.id === id);
+  const store = await readStore();
+  const user = store.users.find((item) => item.id === id);
+  return user ? sanitizeUser(user as StoredUser) : undefined;
 }
 
 export async function updateUserProfile(
@@ -144,53 +312,73 @@ export async function updateUserProfile(
     profileImage?: string;
   }
 ): Promise<SafeUser | null> {
-  const payload = await readJsonFile<UsersFile>('users.json', { users: [] });
-  const userIndex = payload.users.findIndex((user) => user.id === userId);
-
-  if (userIndex === -1) {
-    return null;
-  }
-
-  const current = payload.users[userIndex];
-  const nextUser: UserRecord = { ...current };
+  const updates: {
+    bio?: string | null;
+    profile_image?: string | null;
+  } = {};
 
   if (Object.prototype.hasOwnProperty.call(value, 'bio')) {
-    nextUser.bio = value.bio;
+    updates.bio = normalizeOptionalText(value.bio) ?? null;
   }
 
   if (Object.prototype.hasOwnProperty.call(value, 'profileImage')) {
-    nextUser.profileImage = value.profileImage;
+    updates.profile_image = normalizeOptionalText(value.profileImage) ?? null;
   }
 
-  const updatedUser = normalizeUserRecord({
-    ...nextUser
-  });
+  return updateStore((store) => {
+    const user = store.users.find((item) => item.id === userId) as StoredUser | undefined;
 
-  payload.users[userIndex] = updatedUser;
-  await writeJsonFile<UsersFile>('users.json', payload);
-  return sanitizeUser(updatedUser);
+    if (!user) {
+      return null;
+    }
+
+    if (Object.prototype.hasOwnProperty.call(updates, 'bio')) {
+      user.bio = normalizeOptionalText(updates.bio);
+    }
+
+    if (Object.prototype.hasOwnProperty.call(updates, 'profile_image')) {
+      user.profileImage = normalizeOptionalText(updates.profile_image);
+    }
+
+    return sanitizeUser(user);
+  });
 }
 
 export async function getTripsByUserId(userId: string): Promise<Trip[]> {
-  const payload = await readTripsFile();
-  return payload.trips.filter((trip) => trip.userId === userId).map(normalizeTrip);
+  const store = await readStore();
+  return sortByCreatedDesc(store.trips.filter((trip) => trip.userId === userId).map(normalizeTrip));
 }
 
 export async function getAllTrips(): Promise<Trip[]> {
-  const payload = await readTripsFile();
-  return payload.trips.map(normalizeTrip);
+  const store = await readStore();
+  return sortByCreatedDesc(store.trips.map(normalizeTrip));
+}
+
+export async function getPublicSocialTrips(): Promise<SocialTrip[]> {
+  const store = await readStore();
+  return sortByCreatedDesc(
+    store.trips.filter((trip) => trip.isPublic ?? true).map(normalizeTrip)
+  ).map((trip) => {
+    const owner = store.users.find((user) => user.id === trip.userId);
+    return {
+      ...trip,
+      userName: owner?.name ?? 'Traveler',
+      likesCount: store.likes.filter((like) => like.tripId === trip.id).length,
+      commentsCount: store.comments.filter((comment) => comment.tripId === trip.id).length
+    };
+  });
 }
 
 export async function getTripById(id: string): Promise<Trip | undefined> {
-  const payload = await readTripsFile();
-  const trip = payload.trips.find((item) => item.id === id);
+  const store = await readStore();
+  const trip = store.trips.find((item) => item.id === id);
   return trip ? normalizeTrip(trip) : undefined;
 }
 
 export async function createTrip(trip: Trip): Promise<void> {
-  const payload = await readTripsFile();
-  payload.trips.push(trip);
-  await writeTripsFile(payload);
+  await updateStore((store) => {
+    store.trips.push(normalizeTrip(trip));
+  });
 }
 
 export async function updateTripForUser(
@@ -198,138 +386,142 @@ export async function updateTripForUser(
   userId: string,
   updater: (trip: Trip) => Trip
 ): Promise<Trip | null> {
-  const payload = await readTripsFile();
-  const tripIndex = payload.trips.findIndex((trip) => trip.id === tripId && trip.userId === userId);
+  const existingTrip = await getTripByIdForUser(tripId, userId);
 
-  if (tripIndex === -1) {
+  if (!existingTrip) {
     return null;
   }
 
-  const updated = updater(payload.trips[tripIndex]);
-  payload.trips[tripIndex] = updated;
-  await writeTripsFile(payload);
-  return updated;
+  const updatedTrip = normalizeTrip(updater(existingTrip));
+  return updateStore((store) => {
+    const index = store.trips.findIndex((trip) => trip.id === tripId && trip.userId === userId);
+
+    if (index < 0) {
+      return null;
+    }
+
+    store.trips[index] = updatedTrip;
+    return updatedTrip;
+  });
 }
 
 export async function getTripByIdForUser(
   tripId: string,
   userId: string
 ): Promise<Trip | undefined> {
-  const payload = await readTripsFile();
-  const trip = payload.trips.find((item) => item.id === tripId && item.userId === userId);
+  const store = await readStore();
+  const trip = store.trips.find((item) => item.id === tripId && item.userId === userId);
   return trip ? normalizeTrip(trip) : undefined;
 }
 
 export async function getLikesByTripId(tripId: string): Promise<Like[]> {
-  const payload = await readLikesFile();
-  return payload.likes.filter((like) => like.tripId === tripId);
+  const store = await readStore();
+  return sortByCreatedDesc(store.likes.filter((like) => like.tripId === tripId));
 }
 
 export async function hasUserLikedTrip(tripId: string, userId: string): Promise<boolean> {
-  const likes = await getLikesByTripId(tripId);
-  return likes.some((like) => like.userId === userId);
+  const store = await readStore();
+  return store.likes.some((like) => like.tripId === tripId && like.userId === userId);
 }
 
 export async function addLike(
   tripId: string,
   userId: string
 ): Promise<{ like: Like; created: boolean }> {
-  const payload = await readLikesFile();
-  const existingLike = payload.likes.find(
-    (like) => like.tripId === tripId && like.userId === userId
-  );
+  return updateStore((store) => {
+    const existingLike = store.likes.find(
+      (like) => like.tripId === tripId && like.userId === userId
+    );
+    if (!existingLike) {
+      const like = {
+        id: crypto.randomUUID(),
+        tripId,
+        userId,
+        createdAt: new Date().toISOString()
+      };
+      store.likes.push(like);
 
-  if (existingLike) {
-    return { like: existingLike, created: false };
-  }
+      return {
+        like,
+        created: true
+      };
+    }
 
-  const like: Like = {
-    id: crypto.randomUUID(),
-    tripId,
-    userId,
-    createdAt: new Date().toISOString()
-  };
-
-  payload.likes.push(like);
-  await writeLikesFile(payload);
-  return { like, created: true };
+    return {
+      like: existingLike,
+      created: false
+    };
+  });
 }
 
 export async function removeLike(tripId: string, userId: string): Promise<boolean> {
-  const payload = await readLikesFile();
-  const nextLikes = payload.likes.filter(
-    (like) => !(like.tripId === tripId && like.userId === userId)
-  );
-
-  if (nextLikes.length === payload.likes.length) {
-    return false;
-  }
-
-  payload.likes = nextLikes;
-  await writeLikesFile(payload);
-  return true;
+  return updateStore((store) => {
+    const before = store.likes.length;
+    store.likes = store.likes.filter((like) => like.tripId !== tripId || like.userId !== userId);
+    return store.likes.length !== before;
+  });
 }
 
 export async function isFollowingUser(followerId: string, followingId: string): Promise<boolean> {
-  const payload = await readFollowsFile();
-  return payload.follows.some(
+  const store = await readStore();
+  return store.follows.some(
     (follow) => follow.followerId === followerId && follow.followingId === followingId
   );
 }
 
 export async function getFollowersCount(userId: string): Promise<number> {
-  const payload = await readFollowsFile();
-  return payload.follows.filter((follow) => follow.followingId === userId).length;
+  const store = await readStore();
+  return store.follows.filter((follow) => follow.followingId === userId).length;
 }
 
 export async function getFollowingCount(userId: string): Promise<number> {
-  const payload = await readFollowsFile();
-  return payload.follows.filter((follow) => follow.followerId === userId).length;
+  const store = await readStore();
+  return store.follows.filter((follow) => follow.followerId === userId).length;
 }
 
 export async function addFollow(
   followerId: string,
   followingId: string
 ): Promise<{ follow: Follow; created: boolean }> {
-  const payload = await readFollowsFile();
-  const existing = payload.follows.find(
-    (follow) => follow.followerId === followerId && follow.followingId === followingId
-  );
+  return updateStore((store) => {
+    const existingFollow = store.follows.find(
+      (follow) => follow.followerId === followerId && follow.followingId === followingId
+    );
+    if (existingFollow) {
+      return {
+        follow: existingFollow,
+        created: false
+      };
+    }
 
-  if (existing) {
-    return { follow: existing, created: false };
-  }
+    const follow = {
+      id: crypto.randomUUID(),
+      followerId,
+      followingId,
+      createdAt: new Date().toISOString()
+    };
+    store.follows.push(follow);
 
-  const follow: Follow = {
-    id: crypto.randomUUID(),
-    followerId,
-    followingId,
-    createdAt: new Date().toISOString()
-  };
-
-  payload.follows.push(follow);
-  await writeFollowsFile(payload);
-  return { follow, created: true };
+    return {
+      follow,
+      created: true
+    };
+  });
 }
 
 export async function removeFollow(followerId: string, followingId: string): Promise<boolean> {
-  const payload = await readFollowsFile();
-  const nextFollows = payload.follows.filter(
-    (follow) => !(follow.followerId === followerId && follow.followingId === followingId)
-  );
-
-  if (nextFollows.length === payload.follows.length) {
-    return false;
-  }
-
-  payload.follows = nextFollows;
-  await writeFollowsFile(payload);
-  return true;
+  return updateStore((store) => {
+    const before = store.follows.length;
+    store.follows = store.follows.filter(
+      (follow) => follow.followerId !== followerId || follow.followingId !== followingId
+    );
+    return store.follows.length !== before;
+  });
 }
 
 export async function getCommentsByTripId(tripId: string): Promise<Comment[]> {
-  const payload = await readCommentsFile();
-  return payload.comments.filter((comment) => comment.tripId === tripId);
+  const store = await readStore();
+  return sortByCreatedDesc(store.comments.filter((comment) => comment.tripId === tripId));
 }
 
 export async function addComment(
@@ -337,70 +529,58 @@ export async function addComment(
   userId: string,
   content: string
 ): Promise<Comment> {
-  const payload = await readCommentsFile();
-  const comment: Comment = {
-    id: crypto.randomUUID(),
-    tripId,
-    userId,
-    content,
-    createdAt: new Date().toISOString()
-  };
-
-  payload.comments.push(comment);
-  await writeCommentsFile(payload);
-  return comment;
+  return updateStore((store) => {
+    const comment = {
+      id: crypto.randomUUID(),
+      tripId,
+      userId,
+      content,
+      createdAt: new Date().toISOString()
+    };
+    store.comments.push(comment);
+    return comment;
+  });
 }
 
 export async function createNotification(notification: Notification): Promise<void> {
-  const payload = await readNotificationsFile();
-  payload.notifications.push(notification);
-  await writeNotificationsFile(payload);
+  await updateStore((store) => {
+    store.notifications.push(notification);
+  });
 }
 
 export async function getNotificationsByUserId(userId: string): Promise<Notification[]> {
-  const payload = await readNotificationsFile();
-  return payload.notifications
-    .filter((notification) => notification.userId === userId)
-    .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  const store = await readStore();
+  return sortByCreatedDesc(
+    store.notifications.filter((notification) => notification.userId === userId)
+  );
 }
 
 export async function getUnreadNotificationsCount(userId: string): Promise<number> {
-  const payload = await readNotificationsFile();
-  return payload.notifications.filter(
+  const store = await readStore();
+  return store.notifications.filter(
     (notification) => notification.userId === userId && !notification.read
   ).length;
 }
 
 export async function markNotificationsRead(userId: string): Promise<number> {
-  const payload = await readNotificationsFile();
-  let updatedCount = 0;
-
-  payload.notifications = payload.notifications.map((notification) => {
-    if (notification.userId !== userId || notification.read) {
-      return notification;
-    }
-
-    updatedCount += 1;
-    return {
-      ...notification,
-      read: true
-    };
+  return updateStore((store) => {
+    let updated = 0;
+    store.notifications.forEach((notification) => {
+      if (notification.userId === userId && !notification.read) {
+        notification.read = true;
+        updated += 1;
+      }
+    });
+    return updated;
   });
-
-  if (updatedCount > 0) {
-    await writeNotificationsFile(payload);
-  }
-
-  return updatedCount;
 }
 
 export async function saveContactMessage(message: ContactMessage): Promise<void> {
-  const payload = await readJsonFile<ContactsFile>('contacts.json', { messages: [] });
-  payload.messages.push(message);
-  await writeJsonFile<ContactsFile>('contacts.json', payload);
+  await updateStore((store) => {
+    store.messages.push(message);
+  });
 }
 
 export function sanitizeUser(user: UserRecord): SafeUser {
-  const { passwordHash, ...safeUser } = user;
-  return safeUser;
+  return normalizeUserRecord(user);
 }

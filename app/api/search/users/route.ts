@@ -18,7 +18,6 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     }
 
     const users = await getUsers();
-
     const results = users
       .filter((user) => user.name.toLowerCase().includes(query))
       .slice(0, 10)

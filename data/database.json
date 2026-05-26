@@ -1,0 +1,263 @@
+{
+  "users": [
+    {
+      "id": "58ce7eed-4227-431a-8df9-0cb98caba936",
+      "name": "Garvit Siwach",
+      "email": "siwach.garvit10@gmail.com",
+      "profileImage": "https://ui-avatars.com/api/?name=Garvit+Siwach&size=300&background=CBA258&color=ffffff",
+      "createdAt": "2026-02-12T10:43:18.622Z",
+      "passwordHash": "$2a$12$syeqkahZlGnU0cPHiovyMOKSLGEgCjObGfGQt81MfBYvGuFE1s8FW"
+    },
+    {
+      "id": "295505e9-d214-475a-aa02-f67c44584c7c",
+      "name": "Test User",
+      "email": "test@example.com",
+      "createdAt": "2026-02-12T10:49:33.809Z",
+      "passwordHash": "$2a$12$dDamOphfgK5K9A7T4r0n6ud2Mb/7Lafki212Zn6cxQDyeC0nq6QPq"
+    },
+    {
+      "id": "39c8bf02-a32b-4b20-b712-09a063b437a8",
+      "name": "Test User",
+      "email": "test2@example.com",
+      "createdAt": "2026-02-12T10:49:40.244Z",
+      "passwordHash": "$2a$12$WcJ7R8eDsRVd/zb6w.kLfObEt05CzBYWUv2bQOaEwu9tFrbZrkoxG"
+    },
+    {
+      "id": "b6797ddf-8665-418e-ab17-ecd63fc0f3af",
+      "name": "Test User",
+      "email": "test3@example.com",
+      "createdAt": "2026-02-12T10:50:22.116Z",
+      "passwordHash": "$2a$12$npJVUe.iCBR/uualCZ.bsOQ2/9OsqBfEAWgsSzSsggL7vCVA4x1ha"
+    },
+    {
+      "id": "69be1c82-9d61-472b-bc15-596c5a3b7fbd",
+      "name": "Test User",
+      "email": "test4@example.com",
+      "createdAt": "2026-02-12T10:51:16.370Z",
+      "passwordHash": "$2a$12$A01ZurMHq9U7ygMcE/6gaOdGPYx7mTpsaxqpP4p1nSYq89w0D3OBO"
+    },
+    {
+      "id": "8f8eb0f8-d8b1-4f10-8022-44d56bd96ab6",
+      "name": "Anshaj Siwach",
+      "email": "siwach.anshaj10@gmail.com",
+      "profileImage": "https://randomuser.me/api/portraits/men/32.jpg",
+      "createdAt": "2026-02-12T10:53:23.694Z",
+      "passwordHash": "$2a$12$zIj3Fbi1YwpPyxmTsKCQmezoPOoNSabkqEbutB4weLQH6rUIozCcu"
+    },
+    {
+      "id": "ae6bc0df-6ed0-49bb-809a-72c8ccd2c143",
+      "name": "Test User 001",
+      "email": "test001@user.com",
+      "createdAt": "2026-05-26T16:53:15.758Z",
+      "passwordHash": "scrypt:0b461fd44a390a32c8acbaf54434eb9d:a8331921dbe3c21c385a5c2e44e600ff9beb7fd2a1e1d69770b5472e09ed42453c8ecaa8a6b14b8fac29819b5f5d6c48d25b4e6db73be01ccc458db35c72e726"
+    }
+  ],
+  "trips": [
+    {
+      "id": "5580c183-0530-4ff4-a375-957447949f8d",
+      "userId": "58ce7eed-4227-431a-8df9-0cb98caba936",
+      "destination": "Kashmir",
+      "startDate": "2026-02-13",
+      "endDate": "2026-02-15",
+      "budget": "20000",
+      "travelType": "Friends",
+      "notes": "…",
+      "itineraryDays": [
+        {
+          "id": "01f37c3f-4705-49a0-89f7-cb9f222bd6cb",
+          "title": "Day 1",
+          "activities": [
+            {
+              "id": "b90104aa-fb6c-46ae-8158-9707a4ce9a34",
+              "name": "Gondola, Gulmarg"
+            }
+          ]
+        },
+        {
+          "id": "31dce542-1e48-47db-b451-992bde70147e",
+          "title": "Day 2",
+          "activities": [
+            {
+              "id": "37b7e401-f6f8-48fa-910c-d1f27d0157cb",
+              "name": "Shikara, Dal Lake"
+            }
+          ]
+        },
+        {
+          "id": "10daf4a8-870f-4d32-8490-ed1de3d219e2",
+          "title": "Day 3",
+          "activities": [
+            {
+              "id": "e0f1f17a-ccbc-4c0b-a987-f85eea69953d",
+              "name": "Sledge, Sonmarg"
+            }
+          ]
+        }
+      ],
+      "isPublic": true,
+      "createdAt": "2026-02-12T11:13:41.469Z",
+      "updatedAt": "2026-02-12T11:14:30.619Z",
+      "lastViewedAt": "2026-05-26T16:52:02.342Z"
+    },
+    {
+      "id": "b4ab4e20-a765-4dca-9238-ab62d29df94e",
+      "userId": "58ce7eed-4227-431a-8df9-0cb98caba936",
+      "destination": "Dehradun",
+      "startDate": "2026-02-02",
+      "endDate": "2026-02-03",
+      "budget": "100",
+      "travelType": "Solo",
+      "notes": "…",
+      "itineraryDays": [
+        {
+          "id": "6b1d8924-0287-4826-8839-da4d93f63daf",
+          "title": "Day 1",
+          "activities": []
+        },
+        {
+          "id": "930a9188-b7b2-4346-b588-666857391232",
+          "title": "Day 2",
+          "activities": []
+        }
+      ],
+      "isPublic": true,
+      "createdAt": "2026-02-12T11:23:09.168Z",
+      "updatedAt": "2026-02-12T11:23:09.168Z",
+      "lastViewedAt": "2026-02-12T11:45:32.621Z"
+    }
+  ],
+  "likes": [
+    {
+      "id": "de37c112-9f5a-4079-bb06-f8def3aad715",
+      "tripId": "5580c183-0530-4ff4-a375-957447949f8d",
+      "userId": "8f8eb0f8-d8b1-4f10-8022-44d56bd96ab6",
+      "createdAt": "2026-02-12T11:46:06.950Z"
+    },
+    {
+      "id": "7d83c6a2-585a-42d2-9caf-e9d798c98f0a",
+      "tripId": "b4ab4e20-a765-4dca-9238-ab62d29df94e",
+      "userId": "8f8eb0f8-d8b1-4f10-8022-44d56bd96ab6",
+      "createdAt": "2026-02-12T11:46:08.924Z"
+    },
+    {
+      "id": "8f88f9b2-90ec-4368-80e3-49523809c08a",
+      "tripId": "b4ab4e20-a765-4dca-9238-ab62d29df94e",
+      "userId": "58ce7eed-4227-431a-8df9-0cb98caba936",
+      "createdAt": "2026-02-12T12:20:06.111Z"
+    },
+    {
+      "id": "7652466f-33fe-4ff0-9ae5-65f2d7310524",
+      "tripId": "5580c183-0530-4ff4-a375-957447949f8d",
+      "userId": "58ce7eed-4227-431a-8df9-0cb98caba936",
+      "createdAt": "2026-02-12T12:20:08.476Z"
+    },
+    {
+      "id": "7fde509e-3cab-48e2-af4d-9be8c0fe9aa6",
+      "tripId": "5580c183-0530-4ff4-a375-957447949f8d",
+      "userId": "ae6bc0df-6ed0-49bb-809a-72c8ccd2c143",
+      "createdAt": "2026-05-26T16:53:34.332Z"
+    }
+  ],
+  "follows": [
+    {
+      "id": "8b62973c-6fd4-4179-91ab-c8d03bae9b44",
+      "followerId": "8f8eb0f8-d8b1-4f10-8022-44d56bd96ab6",
+      "followingId": "58ce7eed-4227-431a-8df9-0cb98caba936",
+      "createdAt": "2026-02-12T11:46:11.491Z"
+    },
+    {
+      "id": "2d36a668-286e-4bf6-bfe4-f29181dec4a5",
+      "followerId": "ae6bc0df-6ed0-49bb-809a-72c8ccd2c143",
+      "followingId": "58ce7eed-4227-431a-8df9-0cb98caba936",
+      "createdAt": "2026-05-26T16:53:24.049Z"
+    }
+  ],
+  "comments": [
+    {
+      "id": "6de5fe16-c836-4429-8f2a-5222cfb43835",
+      "tripId": "5580c183-0530-4ff4-a375-957447949f8d",
+      "userId": "8f8eb0f8-d8b1-4f10-8022-44d56bd96ab6",
+      "content": "nice",
+      "createdAt": "2026-02-12T11:46:27.653Z"
+    },
+    {
+      "id": "3f5618a3-a596-4703-9d17-6310bc16c670",
+      "tripId": "5580c183-0530-4ff4-a375-957447949f8d",
+      "userId": "ae6bc0df-6ed0-49bb-809a-72c8ccd2c143",
+      "content": "Nice",
+      "createdAt": "2026-05-26T16:53:40.115Z"
+    }
+  ],
+  "notifications": [
+    {
+      "id": "e4e01ce1-89d2-461e-97bc-0613d95126e4",
+      "userId": "58ce7eed-4227-431a-8df9-0cb98caba936",
+      "type": "like",
+      "actorId": "8f8eb0f8-d8b1-4f10-8022-44d56bd96ab6",
+      "tripId": "5580c183-0530-4ff4-a375-957447949f8d",
+      "createdAt": "2026-02-12T11:46:06.951Z",
+      "read": true
+    },
+    {
+      "id": "c7f23af4-6192-4d84-94eb-252aae6eb73d",
+      "userId": "58ce7eed-4227-431a-8df9-0cb98caba936",
+      "type": "like",
+      "actorId": "8f8eb0f8-d8b1-4f10-8022-44d56bd96ab6",
+      "tripId": "b4ab4e20-a765-4dca-9238-ab62d29df94e",
+      "createdAt": "2026-02-12T11:46:08.925Z",
+      "read": true
+    },
+    {
+      "id": "44caaf0c-50d8-4c20-a1b7-5e0dbae13f9b",
+      "userId": "58ce7eed-4227-431a-8df9-0cb98caba936",
+      "type": "follow",
+      "actorId": "8f8eb0f8-d8b1-4f10-8022-44d56bd96ab6",
+      "createdAt": "2026-02-12T11:46:11.491Z",
+      "read": true
+    },
+    {
+      "id": "c7b75c86-f94a-4d76-8dcf-63a681afacf4",
+      "userId": "58ce7eed-4227-431a-8df9-0cb98caba936",
+      "type": "comment",
+      "actorId": "8f8eb0f8-d8b1-4f10-8022-44d56bd96ab6",
+      "tripId": "5580c183-0530-4ff4-a375-957447949f8d",
+      "createdAt": "2026-02-12T11:46:27.654Z",
+      "read": true
+    },
+    {
+      "id": "82f94c0c-1a3a-4f3c-b5ab-bf430d92423d",
+      "userId": "8f8eb0f8-d8b1-4f10-8022-44d56bd96ab6",
+      "type": "follow",
+      "actorId": "58ce7eed-4227-431a-8df9-0cb98caba936",
+      "createdAt": "2026-02-12T11:46:39.417Z",
+      "read": true
+    },
+    {
+      "id": "f984ddf9-1223-4100-a6da-05ba284f8d39",
+      "userId": "58ce7eed-4227-431a-8df9-0cb98caba936",
+      "type": "follow",
+      "actorId": "ae6bc0df-6ed0-49bb-809a-72c8ccd2c143",
+      "createdAt": "2026-05-26T16:53:24.049Z",
+      "read": true
+    },
+    {
+      "id": "3ff640ee-5694-4ebc-b7e3-bce06783ff0a",
+      "userId": "58ce7eed-4227-431a-8df9-0cb98caba936",
+      "type": "like",
+      "actorId": "ae6bc0df-6ed0-49bb-809a-72c8ccd2c143",
+      "tripId": "5580c183-0530-4ff4-a375-957447949f8d",
+      "createdAt": "2026-05-26T16:53:34.334Z",
+      "read": true
+    },
+    {
+      "id": "e322a9db-1b15-482c-a367-16ecdd80a7ae",
+      "userId": "58ce7eed-4227-431a-8df9-0cb98caba936",
+      "type": "comment",
+      "actorId": "ae6bc0df-6ed0-49bb-809a-72c8ccd2c143",
+      "tripId": "5580c183-0530-4ff4-a375-957447949f8d",
+      "createdAt": "2026-05-26T16:53:40.116Z",
+      "read": true
+    }
+  ],
+  "messages": []
+}
