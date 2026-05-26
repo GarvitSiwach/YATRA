@@ -1,6 +1,8 @@
 import { promises as fs } from 'fs';
+import os from 'os';
 import path from 'path';
 
+import seedDatabase from '@/data/database.json';
 import {
   Comment,
   CommentsFile,
@@ -32,19 +34,11 @@ export type DatabaseFile = UsersFile &
   NotificationsFile &
   ContactsFile;
 
-const DATABASE_PATH = path.join(process.cwd(), 'data', 'database.json');
-
-function emptyStore(): DatabaseFile {
-  return {
-    users: [],
-    trips: [],
-    likes: [],
-    follows: [],
-    comments: [],
-    notifications: [],
-    messages: []
-  };
-}
+const DATABASE_PATH =
+  process.env.YATRA_DATABASE_PATH ??
+  (process.env.VERCEL
+    ? path.join(os.tmpdir(), 'yatra-database.json')
+    : path.join(process.cwd(), 'data', 'database.json'));
 
 function normalizeOptionalText(value: unknown): string | undefined {
   if (typeof value !== 'string') {
@@ -89,28 +83,37 @@ async function readStore(): Promise<DatabaseFile> {
     const raw = await fs.readFile(DATABASE_PATH, 'utf8');
     const parsed = JSON.parse(raw) as Partial<DatabaseFile>;
 
-    return {
-      users: Array.isArray(parsed.users)
-        ? (parsed.users as StoredUser[]).map(normalizeStoredUser)
-        : [],
-      trips: Array.isArray(parsed.trips) ? (parsed.trips as Trip[]).map(normalizeTrip) : [],
-      likes: Array.isArray(parsed.likes) ? (parsed.likes as Like[]) : [],
-      follows: Array.isArray(parsed.follows) ? (parsed.follows as Follow[]) : [],
-      comments: Array.isArray(parsed.comments) ? (parsed.comments as Comment[]) : [],
-      notifications: Array.isArray(parsed.notifications)
-        ? (parsed.notifications as Notification[])
-        : [],
-      messages: Array.isArray(parsed.messages) ? (parsed.messages as ContactMessage[]) : []
-    };
+    return normalizeStore(parsed);
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
-      const store = emptyStore();
+      const store = normalizeStore(seedDatabase as Partial<DatabaseFile>);
       await writeStore(store);
       return store;
     }
 
     throw error;
   }
+}
+
+function normalizeStore(value: Partial<DatabaseFile>): DatabaseFile {
+  return {
+    users: Array.isArray(value.users) ? (value.users as StoredUser[]).map(normalizeStoredUser) : [],
+    trips: Array.isArray(value.trips)
+      ? (value.trips as Trip[]).map((trip) =>
+          normalizeTrip({
+            ...trip,
+            itineraryDays: normalizeItineraryDays(trip.itineraryDays)
+          })
+        )
+      : [],
+    likes: Array.isArray(value.likes) ? (value.likes as Like[]) : [],
+    follows: Array.isArray(value.follows) ? (value.follows as Follow[]) : [],
+    comments: Array.isArray(value.comments) ? (value.comments as Comment[]) : [],
+    notifications: Array.isArray(value.notifications)
+      ? (value.notifications as Notification[])
+      : [],
+    messages: Array.isArray(value.messages) ? (value.messages as ContactMessage[]) : []
+  };
 }
 
 async function writeStore(store: DatabaseFile): Promise<void> {

@@ -15,6 +15,8 @@ Create `.env.local` in the project root:
 
 ```env
 YATRA_SESSION_SECRET=replace-with-a-long-random-string
+# Optional. Defaults to data/database.json locally and /tmp/yatra-database.json on Vercel.
+YATRA_DATABASE_PATH=
 ```
 
 This secret signs local session cookies. If it is missing, the app uses a development fallback.
@@ -32,6 +34,8 @@ All runtime data lives in `data/database.json`:
 - `messages`
 
 The storage helpers are in `lib/storage.ts`. Signup writes new users to the JSON file, and trips/social actions update the same file.
+
+On Vercel, the deployed project filesystem is read-only. The app automatically seeds from `data/database.json` and writes runtime changes to `/tmp/yatra-database.json` so API routes can still run. Vercel's `/tmp` storage is ephemeral, so data can reset after cold starts or redeploys. For permanent hosted data, set `YATRA_DATABASE_PATH` only on a writable self-hosted server or move to a persistent store.
 
 ## Local Run
 
@@ -52,4 +56,4 @@ Then open [http://localhost:3000](http://localhost:3000).
 
 ## Deployment Note
 
-JSON file writes are best for local or small self-hosted deployments with a writable filesystem. Serverless platforms can reset or block runtime file writes, so use a persistent database if the app grows beyond small local data.
+This setup is Vercel-compatible for demos and lightweight use, but hosted JSON writes are not durable on serverless infrastructure. Keep important production data in a persistent service if the app grows.
