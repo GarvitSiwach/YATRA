@@ -3,14 +3,8 @@ import type { Metadata } from 'next';
 import FeedCard from '@/components/FeedCard';
 import SortTabs from '@/components/SortTabs';
 import { getSessionUserFromCookies } from '@/lib/auth';
-import { buildSocialTrips, getTopTrips, sortSocialTrips } from '@/lib/social';
-import {
-  getAllTrips,
-  getUsers,
-  readCommentsFile,
-  readFollowsFile,
-  readLikesFile
-} from '@/lib/storage';
+import { getTopTrips, sortSocialTrips } from '@/lib/social';
+import { getPublicSocialTrips, readFollowsFile, readLikesFile } from '@/lib/storage';
 
 export const metadata: Metadata = {
   title: 'Feed'
@@ -29,22 +23,12 @@ function normalizeSort(value: string | undefined): 'latest' | 'top' {
 export default async function FeedPage({ searchParams }: FeedPageProps): Promise<JSX.Element> {
   const sort = normalizeSort(searchParams?.sort);
 
-  const [sessionUser, trips, users, likesPayload, commentsPayload, followsPayload] =
-    await Promise.all([
-      getSessionUserFromCookies(),
-      getAllTrips(),
-      getUsers(),
-      readLikesFile(),
-      readCommentsFile(),
-      readFollowsFile()
-    ]);
-
-  const socialTrips = buildSocialTrips({
-    trips,
-    users,
-    likes: likesPayload.likes,
-    comments: commentsPayload.comments
-  });
+  const [sessionUser, socialTrips, likesPayload, followsPayload] = await Promise.all([
+    getSessionUserFromCookies(),
+    getPublicSocialTrips(),
+    readLikesFile(),
+    readFollowsFile()
+  ]);
 
   const orderedTrips =
     sort === 'top' ? getTopTrips(socialTrips, 10) : sortSocialTrips(socialTrips, 'latest');

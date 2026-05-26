@@ -1,11 +1,6 @@
 import { NextResponse } from 'next/server';
 
-import {
-  createSessionToken,
-  getSessionUserFromCookies,
-  SESSION_COOKIE_NAME,
-  sessionCookieOptions
-} from '@/lib/auth';
+import { getSessionUserFromCookies } from '@/lib/auth';
 import { getTripsByUserId, getUserById, updateUserProfile } from '@/lib/storage';
 
 export const runtime = 'nodejs';
@@ -113,10 +108,7 @@ export async function PUT(request: Request): Promise<NextResponse> {
       return NextResponse.json({ error: 'User not found.' }, { status: 404 });
     }
 
-    const token = await createSessionToken(updatedUser);
-    const response = NextResponse.json({ profile: updatedUser }, { status: 200 });
-    response.cookies.set(SESSION_COOKIE_NAME, token, sessionCookieOptions);
-    return response;
+    return NextResponse.json({ profile: updatedUser }, { status: 200 });
   } catch {
     return NextResponse.json({ error: 'Unable to update profile right now.' }, { status: 500 });
   }

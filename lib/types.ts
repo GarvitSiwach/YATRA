@@ -4,11 +4,10 @@ export type UserRecord = {
   email: string;
   profileImage?: string;
   bio?: string;
-  passwordHash: string;
   createdAt: string;
 };
 
-export type SafeUser = Omit<UserRecord, 'passwordHash'>;
+export type SafeUser = UserRecord;
 export type User = {
   id: string;
   name: string;

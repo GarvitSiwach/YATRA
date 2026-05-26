@@ -7,6 +7,7 @@ import ProtectedNavbar from '@/components/ProtectedNavbar';
 import { getSessionUserFromCookies } from '@/lib/auth';
 import { getTripsByUserId } from '@/lib/storage';
 import { countUpcomingTrips } from '@/lib/trip-utils';
+import { Trip } from '@/lib/types';
 
 export const metadata: Metadata = {
   title: 'Dashboard'
@@ -19,7 +20,13 @@ export default async function DashboardPage(): Promise<JSX.Element> {
     redirect('/login');
   }
 
-  const trips = await getTripsByUserId(user.id);
+  let trips: Trip[] = [];
+
+  try {
+    trips = await getTripsByUserId(user.id);
+  } catch (error) {
+    console.error('Dashboard trips load error:', error);
+  }
 
   const recentViewedTrip =
     [...trips]

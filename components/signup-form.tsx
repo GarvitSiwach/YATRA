@@ -9,12 +9,14 @@ export default function SignupForm(): JSX.Element {
   const [password, setPassword] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const router = useRouter();
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>): Promise<void> {
     event.preventDefault();
     setBusy(true);
     setError('');
+    setSuccess('');
 
     try {
       const response = await fetch('/api/auth/signup', {
@@ -25,10 +27,19 @@ export default function SignupForm(): JSX.Element {
         body: JSON.stringify({ name, email, password })
       });
 
-      const payload = (await response.json()) as { error?: string };
+      const payload = (await response.json()) as {
+        error?: string;
+        requiresEmailConfirmation?: boolean;
+      };
 
       if (!response.ok) {
         setError(payload.error ?? 'Unable to create your account right now.');
+        return;
+      }
+
+      if (payload.requiresEmailConfirmation) {
+        setSuccess('Account created. Please verify your email, then log in.');
+        router.push('/login');
         return;
       }
 
@@ -80,6 +91,7 @@ export default function SignupForm(): JSX.Element {
       </label>
 
       {error && <p className="text-sm text-red-600">{error}</p>}
+      {success && <p className="text-sm text-green-700">{success}</p>}
 
       <button
         type="submit"
